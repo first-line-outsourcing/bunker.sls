@@ -4,7 +4,7 @@ import * as models from '../models/PostgreSQL';
 
 const sequelize = new Sequelize({
   dialect: 'postgres',
-  database: process.env.DB_NAME || 'toolset',
+  database: process.env.DB_NAME || 'postgres',
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'example',
   host: process.env.DB_HOST || 'localhost',

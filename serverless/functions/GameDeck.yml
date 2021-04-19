@@ -1,0 +1,7 @@
+GameDeck:
+  handler: api/gameDeck/handler.handle
+
+  #  tags:
+  #    client: ${file(env.yml):${opt:stage, self:provider.stage}.CLIENT}
+  #  timeout: 28
+  events:

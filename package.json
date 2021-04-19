@@ -24,7 +24,8 @@
     "sonarqube:up": "docker-compose -f docker-compose.yml up -d sonarqube",
     "sonarqube-scanner": "node sonar-project.js",
     "sonarqube-verify": "sonarqube-verify",
-    "containers:down": "docker-compose -f docker-compose.yml down"
+    "containers:down": "docker-compose -f docker-compose.yml down",
+    "postgres": "docker exec -ti flosls_postgres1 psql -U postgres"
   },
   "engines": {
     "node": ">=12.0.0"
@@ -95,10 +96,15 @@
     "dynamoose": "^2.7.0",
     "node-uuid": "^1.4.8",
     "nodemailer": "^6.4.18",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.22.3",
+    "sequelize-cli-typescript": "^3.2.0-c",
     "sequelize-typescript": "^1.1.0",
+    "serverless-websockets-plugin": "^1.0.0",
     "source-map-support": "^0.5.19",
+    "uuid": "^8.3.2",
     "xml2js": "^0.4.23"
   },
   "husky": {

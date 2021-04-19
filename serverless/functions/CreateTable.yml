@@ -1,0 +1,21 @@
+createTable:
+  handler: api/create-table/handler.createTable
+  tags:
+    client: ${file(env.yml):${opt:stage, self:provider.stage}.CLIENT}
+  timeout: 28
+  events:
+    - http:
+        path: api/create-table
+        method: get
+        integration: lambda
+        cors: true
+
+test:
+  handler: api/create-table/handler.test
+  timeout: 28
+  events:
+    - http:
+        path: api/test
+        method: post
+        integration: lambda
+        cors: true

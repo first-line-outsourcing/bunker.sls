@@ -1,0 +1,68 @@
+createGame:
+  handler: api/game/handler.createGame
+  tags:
+    client: ${file(env.yml):${opt:stage, self:provider.stage}.CLIENT}
+    timeout: 28
+  events:
+    - websocket:
+        - route: create
+    - http:
+        path: api/game/create
+        method: post
+        integration: lambda
+        cors: true
+        #          origin: '*'
+        #          headers:
+        #            - Content-Type
+        #            - X-Amz-Date
+        #            - Authorization
+        #            - X-Api-Key
+        #            - X-Amz-Security-Token
+        #            - X-Amz-User-Agent
+        #            - Auth-Token
+        #          allowCredentials: false
+#        response:
+#          headers:
+#            Access-Control-Allow-Origin: "'*'"
+#            Content-Type: "'application/json'"
+#          template: $input.json('$')
+#
+#readGame:
+#  handler: api/game/handler.readGame
+#  tags:
+#    client: ${file(env.yml):${opt:stage, self:provider.stage}.CLIENT}
+#    timeout: 28
+#  events:
+#    - http:
+#        path: api/game/read
+#        method: post
+#        integration: lambda
+#        cors: true
+#
+#
+#updateGame:
+#  handler: api/game/handler.updateGame
+#  tags:
+#    client: ${file(env.yml):${opt:stage, self:provider.stage}.CLIENT}
+#    timeout: 28
+#  events:
+#    - websocket:
+#        - route: updateGame
+#    - http:
+#        path: api/game/update
+#        method: post
+#        integration: lambda
+#        cors: true
+#
+#
+#deleteGame:
+#  handler: api/game/handler.deleteGame
+#  tags:
+#    client: ${file(env.yml):${opt:stage, self:provider.stage}.CLIENT}
+#    timeout: 28
+#  events:
+#    - http:
+#        path: api/game/delete
+#        method: post
+#        integration: lambda
+#        cors: true

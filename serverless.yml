@@ -3,12 +3,15 @@ service: template-sls
 provider:
   name: aws
   runtime: nodejs12.x
+  logs:
+    websocket: true
   environment:
     hello: world # this is a hack for env plugin
   region: ${file(env.yml):${opt:stage, self:provider.stage}.REGION}
   profile: ${file(env.yml):${opt:stage, self:provider.stage}.PROFILE}
   tags:
     client: ${file(env.yml):${opt:stage, self:provider.stage}.CLIENT}
+  websocketApiRouteSelectionExpression: $request.body.action
 #  iamRoleStatements:
 #    - Effect: Allow
 #      Action:
@@ -179,3 +182,24 @@ plugins: # order matters!
   #  - serverless-offline-sns
   #  - serverless-s3-local
   - serverless-prune-plugin
+  # - serverless-websockets-plugin
+# service: dev-websocket
+
+# plugins:
+#- serverless-offline
+
+#provider:
+#  memorySize: 128
+#  name: aws
+#  region: us-east-1 # default
+#  runtime: nodejs10.x
+#  stage: dev
+#  versionFunctions: false
+
+#functions:
+#  connect:
+#    events:
+#      - websocket:
+#          route: $connect
+#    handler: handler.connect
+

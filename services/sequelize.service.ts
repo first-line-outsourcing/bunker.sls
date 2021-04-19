@@ -13,4 +13,5 @@ export const connect = async (): Promise<undefined> => {
   await sequelize.sync();
   await sequelize.authenticate();
   connection.isConnected = true;
+  console.log('connection to postgres!');
 };
