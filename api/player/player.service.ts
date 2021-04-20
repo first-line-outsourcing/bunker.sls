@@ -84,6 +84,7 @@ export class PlayerService {
       if ((await PlayerQueryes.countPlayers(gameId)) == 1) {
         await PlayerQueryes.setIsOwner(connectionId);
       }
+      console.log('player was created');
       return 'Player has been created';
     } else return 'Game is full';
   }

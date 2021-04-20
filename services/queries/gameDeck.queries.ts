@@ -1,11 +1,10 @@
-import { GameDeck } from '@models/PostgreSQL';
+import { Card, GameDeck } from '@models/PostgreSQL';
+import sequelize from '@services/sequelize';
 
 export async function create(cardId, gameId) {
   return await GameDeck.create({
-    where: {
-      cardId: cardId,
-      gameId: gameId,
-    },
+    gameId: gameId,
+    cardId: cardId,
   });
 }
 

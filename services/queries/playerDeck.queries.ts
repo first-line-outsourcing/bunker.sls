@@ -2,10 +2,8 @@ import { PlayerDeck } from '@models/PostgreSQL';
 
 export async function create(cardId, playerId) {
   return await PlayerDeck.create({
-    where: {
-      cardId: cardId,
-      playerId: playerId,
-    },
+    cardId: cardId,
+    playerId: playerId,
   });
 }
 

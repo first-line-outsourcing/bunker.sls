@@ -8,12 +8,14 @@ export async function findPlayerByConnectionId(connectionId: string) {
     where: { connectionId: connectionId },
   });
 }
-export async function countPlayers(gameId) {
-  return await Player.count({
+export async function findAndCountPlayers(gameId) {
+  const players = await Player.findAndCountAll({
     where: {
       gameId: gameId,
     },
+    attributes: ['playerId'],
   });
+  return players;
 }
 
 export async function findAllOfflinePlayers(gameId) {
@@ -31,7 +33,7 @@ export async function findAllOfflinePlayers(gameId) {
 
 export async function create(connectionId: string, gameId: string, name: string) {
   return await Player.create({
-    id: ID(),
+    playerId: ID(),
     connectionId: connectionId, // Websocket connectionId
     gameId: gameId,
     name: name,

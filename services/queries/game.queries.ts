@@ -10,7 +10,7 @@ export async function create(gameData) {
     timeOnVote: gameData.timeOnVote,
     timeOnExcuse: gameData.timeOnExcuse,
     timeOnDiscuss: gameData.timeOnDiscuss,
-    link: ID(),
+    link: gameData.link,
     amountDangers: gameData.amountDangers,
     amountSpecialConditions: gameData.amountSpecialConditions,
   });
@@ -47,6 +47,11 @@ export async function updateCustomization(gameData) {
 
 export async function read(id) {
   return await Game.findByPk(id);
+}
+
+export async function getAmountSpecial(id) {
+  const game = await Game.findByPk(id, { attributes: ['amountSpecialConditions'] });
+  return +game.amountSpecialConditions;
 }
 
 export async function updateNumRound(gameId, numRound) {
