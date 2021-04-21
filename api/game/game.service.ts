@@ -1,10 +1,12 @@
 import { AppError, CommonErrors } from '@helper/app-error';
-import { giveStartCards } from '@services/cards-functions/operations';
+import { updateNumVote } from '@services/queries/game.queries';
 import * as GameQueryes from '@services/queries/game.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
 import { GameData } from './game.interface';
-
+import { giveStartCards } from '@services/cards-functions/operations';
 import { connect } from '@services/sequelize.service';
+import { startRound } from './round';
+import { checkNumVoting } from './round';
 
 export class GameService {
   async createGame(gameData: GameData) {
@@ -24,21 +26,41 @@ export class GameService {
   async updateRound(connectionId: string) {
     try {
       const player = await PlayerQueryes.findPlayerByConnectionId(connectionId);
+
       if (!player) return 'Player not found';
 
       const game = await GameQueryes.read(player.gameId);
 
       if (!game) return 'Error';
 
-      switch (game.numRound) {
+      if (!player.isOwner) return 'You are not owner';
+
+      await GameQueryes.updateNumRound(player.gameId, game.numRound);
+
+      switch (game.numRound++) {
         case 0: {
           await giveStartCards(game.id);
+          //TODO response to clients(times, status)
+          break;
+        }
+
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5: {
+          //TODO check amount Voting in round by amount players
+          const numVoting = await checkNumVoting(game.amountPlayers, game.numRound++);
+          await updateNumVote(game.id, numVoting);
+          //TODO response data about gameDecks etc.
+          await startRound(game.id, numVoting);
+          break;
+        }
+        case 6: {
+          //TODO finish game
           break;
         }
       }
-
-      if (player.isOwner) return await GameQueryes.updateNumRound(player.gameId, game.numRound);
-      return 'You are not owner';
     } catch (e) {
       throw new AppError(CommonErrors.InternalServerError, e.message);
     }

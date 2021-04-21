@@ -3,17 +3,11 @@ import { create } from '@services/queries/gameDeck.queries';
 
 export async function giveCardsToGame(gameId) {
   const catastropheCard = await findCards('catastrophe', 1);
-
-  const catastropheCardId: Array<number> = await catastropheCard.map((Card) => Card.id);
-
-  console.log(catastropheCardId);
-  catastropheCardId.forEach((value) => create(value, gameId));
+  catastropheCard.forEach((value) => create(value.id, gameId));
 
   const shelterCards = await findCards('shelter', 5);
+  shelterCards.forEach((value) => create(value.id, gameId));
 
-  const shelterIdCards: Array<number> = await shelterCards.map((Card) => Card.id);
-
-  shelterIdCards.forEach((value) => create(value, gameId));
   // TODO Danger cards too
   //TODO response to clients cards
 

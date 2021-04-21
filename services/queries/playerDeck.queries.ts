@@ -7,9 +7,9 @@ export async function create(cardId, playerId) {
   });
 }
 
-export async function updateIsShow(cardId, playerId, isShow) {
+export async function updateCardData(cardId, playerId, isShow, isUse) {
   return await PlayerDeck.update(
-    { isShow: isShow },
+    { isShow: isShow, isUse: isUse },
     {
       where: {
         cardId: cardId,
@@ -19,19 +19,19 @@ export async function updateIsShow(cardId, playerId, isShow) {
   );
 }
 
-export async function updateIsUse(cardId, playerId, isUse) {
-  return await PlayerDeck.update(
-    {
-      isUse: isUse,
-    },
-    {
-      where: {
-        cardId: cardId,
-        playerId: playerId,
-      },
-    }
-  );
-}
+// export async function updateIsUse(cardId, playerId, isUse) {
+//   return await PlayerDeck.update(
+//     {
+//       isUse: isUse,
+//     },
+//     {
+//       where: {
+//         cardId: cardId,
+//         playerId: playerId,
+//       },
+//     }
+//   );
+// }
 
 export async function destroy(cardId, playerId) {
   return await PlayerDeck.destroy({

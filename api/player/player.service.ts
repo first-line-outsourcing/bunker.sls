@@ -1,10 +1,9 @@
 import { AppError, CommonErrors } from '@helper/app-error';
-import { updateConnectionId } from '@services/queries/player.queries';
 import { connect } from '@services/sequelize.service';
 import * as GameQueryes from '@services/queries/game.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
-import { GameManager } from '../game/game.manager';
-import { ConnectionPlayer, ReconnectionPlayer } from './player.interface';
+import { ConnectionPlayer, ReconnectionPlayer, Vote } from './player.interface';
+import * as Voting from '../process-logic/voting';
 
 export class PlayerService {
   async connectPlayer() {
@@ -49,7 +48,7 @@ export class PlayerService {
     try {
       if (!connect()) return 'Connection is failed';
 
-      const player = updateConnectionId(reconnectionPlayer.playerId, reconnectionPlayer.connectionId);
+      const player = PlayerQueryes.updateConnectionId(reconnectionPlayer.playerId, reconnectionPlayer.connectionId);
 
       if (player) {
         console.log('Player was reconnected');
@@ -74,6 +73,21 @@ export class PlayerService {
 
     console.log('Player leave game');
     return 'Player leave game';
+  }
+
+  async sendVote(vote: Vote) {
+    const player = await PlayerQueryes.findPlayerByConnectionId(vote.connectionId);
+
+    const game = await GameQueryes.read(player.gameId);
+
+    if (game.statusOfRound != 'SendingVote') return 'Not yet!';
+
+    //TODO проверки на кучу условий специальных карточек
+
+    if (await PlayerQueryes.updateSelectedPlayer(player.playerId, vote.playerOnVote)) return 'Voting is okay';
+
+    if (await Voting.checkAmountVote(player.gameId)) await Voting.calcVoting(player.gameId);
+    //TODO проверка на изгнанных + голосовавших, да и в принципе
   }
 
   async createPlayer(connectionId, gameId, name) {

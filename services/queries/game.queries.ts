@@ -51,7 +51,7 @@ export async function read(id) {
 
 export async function getAmountSpecial(id) {
   const game = await Game.findByPk(id, { attributes: ['amountSpecialConditions'] });
-  return +game.amountSpecialConditions;
+  return game.amountSpecialConditions;
 }
 
 export async function updateNumRound(gameId, numRound) {

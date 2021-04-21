@@ -1,4 +1,4 @@
-import { ConnectionPlayer } from './player.interface';
+import { ConnectionPlayer, Vote } from './player.interface';
 import { ReconnectionPlayer } from './player.interface';
 import { PlayerService } from './player.service';
 
@@ -27,6 +27,10 @@ export class PlayerManager {
 
   disconnectPlayer(id) {
     return this.service.disconnectPlayer(id);
+  }
+
+  sendVote(vote: Vote) {
+    return this.service.sendVote(vote);
   }
 
   // const apigwManagementApi = apigwManagement(event);

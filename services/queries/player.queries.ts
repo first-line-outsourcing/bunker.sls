@@ -1,13 +1,15 @@
 //****//
 
-import { Game, Player } from '../../models/PostgreSQL';
+import { Player } from '../../models/PostgreSQL';
 import { ID } from '../generate-id.service';
 
 export async function findPlayerByConnectionId(connectionId: string) {
   return await Player.findOne({
     where: { connectionId: connectionId },
+    attributes: ['playerId', 'gameId'],
   });
 }
+
 export async function findAndCountPlayers(gameId) {
   const players = await Player.findAndCountAll({
     where: {
@@ -16,6 +18,19 @@ export async function findAndCountPlayers(gameId) {
     attributes: ['playerId'],
   });
   return players;
+}
+
+export async function findAllVoting(gameId) {
+  return await Player.findAll({
+    where: {
+      gameId: gameId,
+    },
+    attributes: ['selectedPlayer'],
+  });
+}
+
+export async function countPlayers(gameId) {
+  return Player.count({ where: { gameId: gameId } });
 }
 
 export async function findAllOfflinePlayers(gameId) {

@@ -38,3 +38,15 @@ updateRound:
   events:
     - websocket:
         route: updateRound
+
+updateCard:
+  handler: api/playerDeck/handler.updateCard
+  events:
+    - websocket:
+        route: updateCard
+
+sendVote:
+  handler: api/player/handler.sendVote
+  events:
+    - websocket:
+        route: sendVote
