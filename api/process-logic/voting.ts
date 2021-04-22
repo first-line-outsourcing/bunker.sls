@@ -1,19 +1,16 @@
 import { findAllVoting } from '@services/queries/player.queries';
 import * as GameQueryes from '@services/queries/game.queries';
 
-export async function checkAmountVote(gameId) {
-  const players = await findAllVoting(gameId);
+export async function countVotes(players) {
   let count: number = 0;
 
   players.forEach((value) => {
-    if (value.selectedPlayer != 'None') count++;
+    if (value.selectedPlayer != 'none') count++;
   });
 
-  const game = await GameQueryes.read(gameId);
-
-  return count == game.amountPlayers;
+  return count;
 }
 
-export async function calcVoting(gameId) {
-  //TODO
+export async function calcVoting(players: Array<string>) {
+  let arr = players.map((value) => value);
 }

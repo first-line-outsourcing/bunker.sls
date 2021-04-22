@@ -27,6 +27,7 @@ export interface PlayerSchema {
   selectedPlayer?: string;
   voteOnYourself?: boolean;
   banVotingAgainPlayer?: string;
+  banVoteOnThisPlayer?: boolean;
   skipHisVote?: boolean;
   multiVote?: boolean;
   multiVoteOnPlayer?: string;
@@ -88,6 +89,9 @@ export class Player extends Model<PlayerSchema> {
 
   @Column(DataType.TEXT) // For special condition
   banVotingAgainPlayer: string;
+
+  @Column(DataType.BOOLEAN) // For repeat voting
+  banVoteOnThisPlayer: boolean;
 
   @AllowNull(false)
   @Default(false)

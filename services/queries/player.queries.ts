@@ -6,10 +6,14 @@ import { ID } from '../generate-id.service';
 export async function findPlayerByConnectionId(connectionId: string) {
   return await Player.findOne({
     where: { connectionId: connectionId },
-    attributes: ['playerId', 'gameId'],
   });
 }
 
+export async function findPlayerById(playerId) {
+  return await Player.findOne({
+    where: { playerId: playerId },
+  });
+}
 export async function findAndCountPlayers(gameId) {
   const players = await Player.findAndCountAll({
     where: {
@@ -20,12 +24,11 @@ export async function findAndCountPlayers(gameId) {
   return players;
 }
 
-export async function findAllVoting(gameId) {
+export async function findAllPlayers(gameId) {
   return await Player.findAll({
     where: {
       gameId: gameId,
     },
-    attributes: ['selectedPlayer'],
   });
 }
 
@@ -63,6 +66,19 @@ export async function setIsOwner(connectionId) {
     {
       where: {
         connectionId: connectionId,
+      },
+    }
+  );
+}
+
+export async function updateBanVoteOnThisPlayer(playerId, banVoteOnThisPlayer) {
+  return await Player.update(
+    {
+      banVoteOnThisPlayer: banVoteOnThisPlayer,
+    },
+    {
+      where: {
+        id: playerId,
       },
     }
   );
@@ -115,6 +131,19 @@ export async function updateSelectedPlayer(playerId, selectedPlayer) {
     {
       where: {
         id: playerId,
+      },
+    }
+  );
+}
+
+export async function updateSelectedPlayerByConnectionId(connectionId, selectedPlayer) {
+  return await Player.update(
+    {
+      selectedPlayer: selectedPlayer,
+    },
+    {
+      where: {
+        connectionid: connectionId,
       },
     }
   );

@@ -8,16 +8,6 @@ export interface ConnectionPlayer {
     action: string;
     name: string;
     link: string;
-    isOwner?: boolean;
-    isOut?: boolean;
-    isUse?: boolean;
-    isOnline?: boolean;
-    selectedPlayer?: string;
-    voteOnYourself?: boolean;
-    banVotingAgainPlayer?: string;
-    skipHisVote?: boolean;
-    multiVote?: boolean;
-    multiVoteOnPlayer?: string;
   };
 }
 

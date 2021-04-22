@@ -49,6 +49,20 @@ export async function read(id) {
   return await Game.findByPk(id);
 }
 
+export async function update(gameId, outedPlayerInLastRound?, numVote?) {
+  return await Game.update(
+    {
+      outedPlayerInLastRound: outedPlayerInLastRound,
+      numVote: numVote,
+    },
+    {
+      where: {
+        id: gameId,
+      },
+    }
+  );
+}
+
 export async function getAmountSpecial(id) {
   const game = await Game.findByPk(id, { attributes: ['amountSpecialConditions'] });
   return game.amountSpecialConditions;
