@@ -50,3 +50,9 @@ sendVote:
   events:
     - websocket:
         route: sendVote
+
+endDiscuss:
+  handler: api/player/handler.endDiscuss
+  events:
+    - websocket:
+        route: endDiscuss

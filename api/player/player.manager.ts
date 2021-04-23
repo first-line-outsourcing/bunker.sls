@@ -1,4 +1,4 @@
-import { ConnectionPlayer, Vote } from './player.interface';
+import { ConnectionPlayer, DiscussData, Vote } from './player.interface';
 import { ReconnectionPlayer } from './player.interface';
 import { PlayerService } from './player.service';
 
@@ -31,6 +31,10 @@ export class PlayerManager {
 
   sendVote(vote: Vote) {
     return this.service.sendVote(vote);
+  }
+
+  endDiscuss(discussData: DiscussData) {
+    if (discussData.connectionId) return this.service.endDiscuss(discussData.connectionId);
   }
 
   // const apigwManagementApi = apigwManagement(event);

@@ -1,9 +1,7 @@
 import { errorHandler } from '@helper/error-handler';
 import { log } from '@helper/logger';
 import { apigwManagement } from '@services/websocket-endpoint.service';
-import { contentType } from 'aws-sdk/clients/frauddetector';
-import { PlayerCardData } from '../playerDeck/playerDeck.interface';
-import { ConnectionPlayer, ReconnectionPlayer, Vote } from './player.interface';
+import { ConnectionPlayer, ReconnectionPlayer, Vote, DiscussData } from './player.interface';
 import { PlayerManager } from './player.manager';
 
 exports.connect = async (event, context) => {
@@ -127,6 +125,30 @@ exports.sendVote = async (event, context) => {
 
     vote.playerOnVote = JSON.parse(event.body);
     return manager.sendVote(vote);
+  } catch (e) {
+    /**
+     * Handle all errors
+     */
+    errorHandler(e);
+  }
+};
+
+exports.endDiscuss = async (event, context) => {
+  try {
+    /**
+     * Create the manager object
+     */
+    const manager = new PlayerManager();
+
+    /**
+     * Prepare required data
+     */
+
+    const discussData: DiscussData = {
+      connectionId: event.requestContext.connectionId,
+    };
+
+    return manager.endDiscuss(discussData);
   } catch (e) {
     /**
      * Handle all errors

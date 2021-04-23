@@ -1,6 +1,6 @@
 export interface PlayerCardData {
   cardId: number;
-  playerId: string;
+  connectionId: string;
   isShow?: boolean;
   isUse?: boolean;
 }

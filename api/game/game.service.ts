@@ -1,7 +1,9 @@
 import { AppError, CommonErrors } from '@helper/app-error';
 import { updateNumVote } from '@services/queries/game.queries';
 import * as GameQueryes from '@services/queries/game.queries';
+import { findAllPlayers } from '@services/queries/player.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
+import * as Voting from '../process-logic/voting';
 import { GameData } from './game.interface';
 import { giveStartCards } from '@services/cards-functions/operations';
 import { connect } from '@services/sequelize.service';
@@ -26,18 +28,17 @@ export class GameService {
   async updateRound(connectionId: string) {
     try {
       const player = await PlayerQueryes.findPlayerByConnectionId(connectionId);
-
       if (!player) return 'Player not found';
+      if (!player.isOwner) return 'You are not owner';
 
       const game = await GameQueryes.read(player.gameId);
-
       if (!game) return 'Error';
-
-      if (!player.isOwner) return 'You are not owner';
 
       await GameQueryes.updateNumRound(player.gameId, game.numRound);
 
-      switch (game.numRound++) {
+      switch (
+        game.numRound++ //++  - For next round
+      ) {
         case 0: {
           await giveStartCards(game.id);
           //TODO response to clients(times, status)
@@ -45,11 +46,11 @@ export class GameService {
         }
 
         case 1:
+        //TODO проверка на открытие только профессии
         case 2:
         case 3:
         case 4:
         case 5: {
-          //TODO check amount Voting in round by amount players
           const numVoting = await checkNumVoting(game.amountPlayers, game.numRound++);
           await updateNumVote(game.id, numVoting);
           //TODO response data about gameDecks etc.
@@ -66,43 +67,52 @@ export class GameService {
     }
   }
 
-  async readGame(gameId) {
-    try {
-      if (connect()) {
-        const game = GameQueryes.read(gameId);
+  async updateStatus(connectionId: string) {
+    const player = await PlayerQueryes.findPlayerByConnectionId(connectionId);
+    if (!player) return 0;
+    if (!player.isOwner) return 'You are not owner';
 
-        if (!game) return 'Game not found!';
+    const game = await GameQueryes.read(player.gameId);
+    if (!game) return 0;
 
-        return game;
+    //Check current status
+    switch (game.statusOfRound) {
+      case 'excuse': {
+        const count = await PlayerQueryes.countIsEndDiscuss(player.gameId);
+        if (count == game.amountPlayers) {
+          await GameQueryes.updateStatusOfRound(game.id, 'discuss');
+          return 'start discuss';
+          //TODO доделать ответы
+        }
+        return 'not yet';
       }
-    } catch (e) {
-      throw new AppError(CommonErrors.InternalServerError, e.message);
-    }
-  }
-
-  async updateGame(gameData: GameData) {
-    try {
-      if (connect()) {
-        const game = await GameQueryes.updateCustomization(gameData);
-
-        if (!game) return 'Game not found!';
-
-        return 'Game was updated';
+      case 'discuss': {
+        await GameQueryes.updateStatusOfRound(game.id, 'voting');
+        return 'start voting';
       }
-    } catch (e) {
-      throw new AppError(CommonErrors.InternalServerError, e.message);
-    }
-  }
+      case 'voting': {
+        //Check amount voting
+        const players = await findAllPlayers(player.gameId);
 
-  async deleteGame(gameId: string) {
-    try {
-      if (connect()) {
-        const game = await GameQueryes.destroy(gameId);
+        if ((await Voting.countVotes(players)) != game.amountPlayers) return false;
 
-        return 'Game was deleted';
+        //calc all voting
+        const listOfMax = await Voting.calcVoting(players);
+
+        if (!(await Voting.defineResult(listOfMax, game.id, game.numVote))) return 'повторное голосование';
+        //TODO ответ
+
+        await GameQueryes.updateStatusOfRound(game.id, 'sendingVote');
+        return 'finished voting';
       }
-    } catch (e) {
-      throw new AppError(CommonErrors.InternalServerError, e.message);
+      case 'sendingVote': {
+        await GameQueryes.updateStatusOfRound(game.id, 'excuse');
+        await GameQueryes.updateNumRound(game.id, game.numRound++);
+        return 'start new round';
+      }
+      default: {
+        return 'default';
+      }
     }
   }
 }

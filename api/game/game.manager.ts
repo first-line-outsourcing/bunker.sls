@@ -29,6 +29,10 @@ export class GameManager {
     return this.service.updateRound(connectionId);
   }
 
+  updateStatus(connectionId: string) {
+    return this.service.updateStatus(connectionId);
+  }
+
   // readGame(gameData: GameData){
   //   // if (!gameData.link) {
   //   //   throw new AppError(CommonErrors.BadRequest, "The param 'link' is required.");

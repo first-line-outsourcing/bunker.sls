@@ -1,5 +1,6 @@
 //****//
 
+import sequelize from '@services/sequelize';
 import { Player } from '../../models/PostgreSQL';
 import { ID } from '../generate-id.service';
 
@@ -34,6 +35,18 @@ export async function findAllPlayers(gameId) {
 
 export async function countPlayers(gameId) {
   return Player.count({ where: { gameId: gameId } });
+}
+
+export async function countIsEndDiscuss(gameId) {
+  const Op = require('sequelize');
+  return Player.count({
+    where: {
+      [Op.or]: [
+        { gameId: gameId, isEndDiscuss: true },
+        { gameId: gameId, isOnline: false },
+      ],
+    },
+  });
 }
 
 export async function findAllOfflinePlayers(gameId) {
@@ -84,6 +97,19 @@ export async function updateBanVoteOnThisPlayer(playerId, banVoteOnThisPlayer) {
   );
 }
 
+export async function updateIsEndDiscuss(connectionId, isEndDiscuss) {
+  return await Player.update(
+    {
+      isEndDiscuss: isEndDiscuss,
+    },
+    {
+      where: {
+        connectionId: connectionId,
+      },
+    }
+  );
+}
+
 export async function updateIsOut(playerId, isOut) {
   return await Player.update(
     {
@@ -91,7 +117,20 @@ export async function updateIsOut(playerId, isOut) {
     },
     {
       where: {
-        id: playerId,
+        playerId: playerId,
+      },
+    }
+  );
+}
+
+export async function updateIsShow(playerId, isShow) {
+  return await Player.update(
+    {
+      isShow: isShow,
+    },
+    {
+      where: {
+        playerId: playerId,
       },
     }
   );
@@ -117,7 +156,7 @@ export async function updateConnectionId(playerId, connectionId) {
     },
     {
       where: {
-        id: playerId,
+        playerId: playerId,
       },
     }
   );

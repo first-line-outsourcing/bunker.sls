@@ -1,6 +1,8 @@
 import { errorHandler } from '@helper/error-handler';
 import { log } from '@helper/logger';
+import { findAllPlayers } from '@services/queries/player.queries';
 import { apigwManagement } from '@services/websocket-endpoint.service';
+import * as Voting from '../process-logic/voting';
 import { GameData } from './game.interface';
 import { GameManager } from './game.manager';
 
@@ -34,6 +36,24 @@ exports.updateRound = async (event, context) => {
 
     console.log(connectionId);
     return await manager.updateRound(connectionId);
+  } catch (e) {
+    /**
+     * Handle all errors
+     */
+    errorHandler(e);
+  }
+};
+
+exports.updateStatus = async (event, context) => {
+  log(event);
+
+  try {
+    const manager = new GameManager();
+
+    const connectionId = event.requestContext.connectionId;
+
+    console.log(connectionId);
+    return await manager.updateStatus(connectionId);
   } catch (e) {
     /**
      * Handle all errors

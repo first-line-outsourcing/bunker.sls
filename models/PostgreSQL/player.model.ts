@@ -24,6 +24,8 @@ export interface PlayerSchema {
   isOut?: boolean;
   isUse?: boolean;
   isOnline?: boolean;
+  isShow?: boolean;
+  isEndDiscuss?: boolean;
   selectedPlayer?: string;
   voteOnYourself?: boolean;
   banVotingAgainPlayer?: string;
@@ -78,6 +80,16 @@ export class Player extends Model<PlayerSchema> {
   @AllowNull(false)
   @Column(DataType.BOOLEAN)
   isOnline: boolean;
+
+  @Default(false)
+  @AllowNull(false)
+  @Column(DataType.BOOLEAN)
+  isShow: boolean;
+
+  @Default(false)
+  @AllowNull(false)
+  @Column(DataType.BOOLEAN)
+  isEndDiscuss: boolean;
 
   @Column(DataType.TEXT) // Choosen player on vote
   selectedPlayer: string;

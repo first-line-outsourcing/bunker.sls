@@ -20,3 +20,7 @@ export interface Vote {
   connectionId: string;
   playerOnVote?: string;
 }
+
+export interface DiscussData {
+  connectionId?: string;
+}

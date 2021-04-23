@@ -1,9 +1,10 @@
 import { AppError, CommonErrors } from '@helper/app-error';
+import { update } from '@services/queries/game.queries';
 import { findAllPlayers } from '@services/queries/player.queries';
 import { connect } from '@services/sequelize.service';
 import * as GameQueryes from '@services/queries/game.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
-import { ConnectionPlayer, ReconnectionPlayer, Vote } from './player.interface';
+import { ConnectionPlayer, DiscussData, ReconnectionPlayer, Vote } from './player.interface';
 import * as Voting from '../process-logic/voting';
 
 export class PlayerService {
@@ -74,97 +75,20 @@ export class PlayerService {
 
   async sendVote(vote: Vote) {
     const player = await PlayerQueryes.findPlayerByConnectionId(vote.connectionId);
+    if (!player) return 'Player not find';
     const game = await GameQueryes.read(player.gameId);
+    if (!game) return 'Game not found';
 
-    //Check status
-    if (game.statusOfRound != 'SendingVote') return 'Not yet!';
+    if ((await Voting.checkingParametres(player, game, vote)) == 200) {
+      //Voting
 
-    //Check isOut and LastOuted
-    if (player.isOut && player.playerId != game.outedPlayerInLastRound) {
-      await PlayerQueryes.updateSelectedPlayer(player.playerId, 'cannot');
-      return 'You cannot voting';
+      await PlayerQueryes.updateSelectedPlayer(player.playerId, vote.playerOnVote);
     }
+  }
 
-    //Check banVotingAgainPlayer
-    if (player.banVotingAgainPlayer == vote.playerOnVote) return 'Проголосуйте за кого-то другого!';
-
-    //Check voteOnYourself
-    if (player.voteOnYourself == true) {
-      await PlayerQueryes.updateSelectedPlayer(player.playerId, player.playerId);
-      return 'Вы можете голосовать только против себя!';
-    }
-
-    //Check skipHisVote
-    if (player.skipHisVote == true) {
-      await PlayerQueryes.updateSelectedPlayer(player.playerId, 'skip');
-      return 'Вы пропускаете это голосование!';
-    }
-
-    //Check on banVoteOnThisPlayer
-    const choosenPlayer = await PlayerQueryes.findPlayerById(vote.playerOnVote);
-    if (choosenPlayer.banVoteOnThisPlayer) return 'You cannot vote on this player';
-
-    //Voting
-
-    await PlayerQueryes.updateSelectedPlayer(player.playerId, vote.playerOnVote);
-
-    //Check amount voting
-    const players = await findAllPlayers(player.gameId);
-
-    if ((await Voting.countVotes(players)) != game.amountPlayers) return false;
-
-    const votes = players.map((value) => ({
-      playerId: value.playerId,
-      selectedPlayer: value.selectedPlayer,
-      multiVote: value.multiVote,
-    }));
-
-    var counts = {};
-    votes.forEach((value) => {
-      if (value.selectedPlayer != 'cannot') {
-        let i = 1;
-
-        if (value.multiVote) i = i * 2;
-
-        const player = players.find((elem) => elem.playerId == value.selectedPlayer);
-        if (player.multiVoteOnPlayer) i = i * 2;
-
-        counts[value.selectedPlayer] = (counts[value.selectedPlayer] || 0) + i;
-      }
-    });
-
-    //
-    //Check amount player with max vote
-    //
-    let keys = Object.keys(counts);
-    let max = counts[keys[0]];
-    let listOfMax: string[] = [];
-
-    //Set max
-    for (let i = 1; i < keys.length; i++) {
-      let value = counts[keys[i]];
-      if (value == max) {
-        listOfMax.push(keys[i]);
-      }
-      if (value > max) {
-        max = counts[keys[i]];
-        listOfMax = [];
-        listOfMax.push(keys[i]);
-      }
-    }
-
-    //Checking
-    if (listOfMax.length > 1) {
-      for (let el in listOfMax) {
-        await PlayerQueryes.updateBanVoteOnThisPlayer(el, true);
-      }
-      await GameQueryes.update(game.id, 'none', game.numVote - 1);
-      return 'Повторное голосование'; //TODO ответ
-    }
-
-    await PlayerQueryes.updateIsOut(listOfMax[0], true);
-    await GameQueryes.updateOutedPlayerInLastRound(game.id, listOfMax[0]);
-    //TODO ответ
+  async endDiscuss(connectionId: string) {
+    await PlayerQueryes.updateIsEndDiscuss(connectionId, true);
+    return 'player finished discuss';
   }
 
   async createPlayer(connectionId, gameId, name) {
