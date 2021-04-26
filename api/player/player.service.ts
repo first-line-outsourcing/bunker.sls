@@ -106,6 +106,7 @@ export class PlayerService {
 
   async checkAmountPlayers(gameId) {
     const game = await GameQueryes.read(gameId);
+    if (!game) return 0;
 
     return (await PlayerQueryes.countPlayers(gameId)) < game.amountPlayers;
   }

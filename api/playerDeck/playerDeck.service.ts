@@ -1,4 +1,5 @@
 import { updateCardData } from '@services/queries/playerDeck.queries';
+import { read } from '@services/queries/card.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
 import * as GameQueryes from '@services/queries/game.queries';
 import { PlayerCardData } from './playerDeck.interface';
@@ -14,10 +15,16 @@ export class PlayerDeckService {
     if (!game) return 'Error!';
     if (game.statusOfRound != 'Excusing') return 'You cannot showing right now';
 
-    await updateCardData(playerCardData.cardId, player.playerId, playerCardData.isShow, playerCardData.isUse);
-    //for checking
-    await PlayerQueryes.updateIsShow(playerCardData.playerId, true);
-    //TODO response проверку на тип карты
-    return 'Is showing';
+    //Checking of type card;
+    const card = await read(playerCardData.cardId);
+    if (!card) return 0;
+
+    if (card.type == game.typeCardOnThisRound || game.typeCardOnThisRound == 'none') {
+      await updateCardData(playerCardData.cardId, player.playerId, playerCardData.isShow, playerCardData.isUse);
+      //for checking
+      await PlayerQueryes.updateIsShow(player.playerId, true);
+      return 'Is showing';
+    }
+    return 'Is wrong type of card!';
   }
 }

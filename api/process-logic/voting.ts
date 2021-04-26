@@ -40,6 +40,7 @@ export async function checkingParametres(player: Player, game: Game, vote: Vote)
 
   //Check on banVoteOnThisPlayer
   const choosenPlayer = await PlayerQueryes.findPlayerById(vote.playerOnVote);
+  if (!choosenPlayer) return 0;
 
   if (choosenPlayer.banVoteOnThisPlayer) return 'You cannot vote on this player';
 
@@ -61,6 +62,7 @@ export async function calcVoting(players: Array<Player>) {
       if (value.multiVote) i = i * 2;
 
       const player = players.find((elem) => elem.playerId == value.selectedPlayer);
+      if (!player) return 0;
       if (player.multiVoteOnPlayer) i = i * 2;
 
       counts[value.selectedPlayer] = (counts[value.selectedPlayer] || 0) + i;

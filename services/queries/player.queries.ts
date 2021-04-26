@@ -1,8 +1,9 @@
 //****//
 
-import sequelize from '@services/sequelize';
 import { Player } from '../../models/PostgreSQL';
 import { ID } from '../generate-id.service';
+
+// FIND
 
 export async function findPlayerByConnectionId(connectionId: string) {
   return await Player.findOne({
@@ -15,6 +16,7 @@ export async function findPlayerById(playerId) {
     where: { playerId: playerId },
   });
 }
+
 export async function findAndCountPlayers(gameId) {
   const players = await Player.findAndCountAll({
     where: {
@@ -33,6 +35,31 @@ export async function findAllPlayers(gameId) {
   });
 }
 
+export async function findAllOfflinePlayers(gameId) {
+  const { count, rows } = await Player.findAndCountAll({
+    where: {
+      gameId: gameId,
+      isOnline: false,
+    },
+  });
+  if (count === 0) return false;
+
+  console.log(count);
+  return rows;
+}
+
+export async function findAllActiveConnectionId(gameId) {
+  return await Player.findAll({
+    where: {
+      gameId: gameId,
+      isOnline: true,
+    },
+    attributes: ['connectionId'],
+  });
+}
+
+// COUNT
+
 export async function countPlayers(gameId) {
   return Player.count({ where: { gameId: gameId } });
 }
@@ -49,40 +76,7 @@ export async function countIsEndDiscuss(gameId) {
   });
 }
 
-export async function findAllOfflinePlayers(gameId) {
-  const { count, rows } = await Player.findAndCountAll({
-    where: {
-      gameId: gameId,
-      isOnline: false,
-    },
-  });
-  if (count === 0) return false;
-
-  console.log(count);
-  return rows;
-}
-
-export async function create(connectionId: string, gameId: string, name: string) {
-  return await Player.create({
-    playerId: ID(),
-    connectionId: connectionId, // Websocket connectionId
-    gameId: gameId,
-    name: name,
-  });
-}
-
-export async function setIsOwner(connectionId) {
-  return await Player.update(
-    {
-      isOwner: true,
-    },
-    {
-      where: {
-        connectionId: connectionId,
-      },
-    }
-  );
-}
+// UPDATE
 
 export async function updateBanVoteOnThisPlayer(playerId, banVoteOnThisPlayer) {
   return await Player.update(
@@ -136,19 +130,6 @@ export async function updateIsShow(playerId, isShow) {
   );
 }
 
-export async function updateIsUse(playerId, isUse) {
-  return await Player.update(
-    {
-      isUse: isUse,
-    },
-    {
-      where: {
-        id: playerId,
-      },
-    }
-  );
-}
-
 export async function updateConnectionId(playerId, connectionId) {
   return await Player.update(
     {
@@ -194,6 +175,56 @@ export async function updateIsOnline(playerId: string) {
     {
       where: {
         playerId: playerId,
+      },
+    }
+  );
+}
+
+export async function updateIsOnlineByConnectionId(connectionId: string) {
+  return await Player.update(
+    { isOnline: false },
+    {
+      where: {
+        connectionId: connectionId,
+      },
+    }
+  );
+}
+
+export async function setIsOwner(connectionId) {
+  return await Player.update(
+    {
+      isOwner: true,
+    },
+    {
+      where: {
+        connectionId: connectionId,
+      },
+    }
+  );
+}
+
+//CREATE
+
+export async function create(connectionId: string, gameId: string, name: string) {
+  return await Player.create({
+    playerId: ID(),
+    connectionId: connectionId, // Websocket connectionId
+    gameId: gameId,
+    name: name,
+  });
+}
+
+// NOT USED YET
+
+export async function updateIsUse(playerId, isUse) {
+  return await Player.update(
+    {
+      isUse: isUse,
+    },
+    {
+      where: {
+        id: playerId,
       },
     }
   );

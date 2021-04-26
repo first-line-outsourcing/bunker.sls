@@ -1,3 +1,5 @@
+## PLAYER
+
 connect:
   handler: api/player/handler.connect
   events:
@@ -21,29 +23,12 @@ disconnect:
   events:
     - websocket:
         route: $disconnect
+
 default:
   handler: api/player/handler.defaults
   events:
     - websocket:
         route: $default
-
-createGame:
-  handler: api/game/handler.createGame
-  events:
-    - websocket:
-        route: create
-
-updateRound:
-  handler: api/game/handler.updateRound
-  events:
-    - websocket:
-        route: updateRound
-
-updateCard:
-  handler: api/playerDeck/handler.updateCard
-  events:
-    - websocket:
-        route: updateCard
 
 sendVote:
   handler: api/player/handler.sendVote
@@ -56,3 +41,31 @@ endDiscuss:
   events:
     - websocket:
         route: endDiscuss
+
+# GAME
+
+createGame:
+  handler: api/game/handler.createGame
+  events:
+    - websocket:
+        route: create
+
+startGame:
+  handler: api/game/handler.startGame
+  events:
+    - websocket:
+        route: startGame
+
+updateStatus:
+  handler: api/game/handler.updateStatus
+  events:
+    - websocket:
+        route: updateStatus
+
+# PLAYER_DECK
+
+updateCard:
+  handler: api/playerDeck/handler.updateCard
+  events:
+    - websocket:
+        route: updateCard

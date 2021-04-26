@@ -25,32 +25,11 @@ export class GameManager {
     return this.service.createGame(gameData);
   }
 
-  updateRound(connectionId: string) {
-    return this.service.updateRound(connectionId);
+  startGame(connectionId: string) {
+    return this.service.startGame(connectionId);
   }
 
   updateStatus(connectionId: string) {
     return this.service.updateStatus(connectionId);
   }
-
-  // readGame(gameData: GameData){
-  //   // if (!gameData.link) {
-  //   //   throw new AppError(CommonErrors.BadRequest, "The param 'link' is required.");
-  //   // }
-  //   return this.service.readGame( gameData );
-  // };
-  //
-  // updateGame(gameData: GameData){
-  //   // if (!gameData.link) {
-  //   //   throw new AppError(CommonErrors.BadRequest, "The param 'link' is required.");
-  //   // }
-  //   return this.service.updateGame( gameData );
-  // };
-  //
-  // deleteGame(gameData: GameData){
-  //   // if (!gameData.link) {
-  //   //   throw new AppError(CommonErrors.BadRequest, "The param 'link' is required.");
-  //   // }
-  //   return this.service.deleteGame( gameData );
-  // };
 }

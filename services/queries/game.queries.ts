@@ -65,6 +65,7 @@ export async function update(gameId, outedPlayerInLastRound?, numVote?) {
 
 export async function getAmountSpecial(id) {
   const game = await Game.findByPk(id, { attributes: ['amountSpecialConditions'] });
+  if (!game) return 0;
   return game.amountSpecialConditions;
 }
 

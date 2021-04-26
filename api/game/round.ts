@@ -1,7 +1,3 @@
-export async function startRound(gameId, numRound) {
-  //TODO
-}
-
 export async function checkNumVoting(amountPlayers, numRound) {
   switch (numRound) {
     case 1: {

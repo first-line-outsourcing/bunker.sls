@@ -1,5 +1,4 @@
-import { Card, GameDeck } from '@models/PostgreSQL';
-import sequelize from '@services/sequelize';
+import { GameDeck } from '@models/PostgreSQL';
 
 export async function create(cardId, gameId) {
   return await GameDeck.create({
@@ -7,7 +6,14 @@ export async function create(cardId, gameId) {
     cardId: cardId,
   });
 }
-
+export async function findCardOfIsShow(gameId, isShow) {
+  return await GameDeck.findOne({
+    where: {
+      gameId: gameId,
+      isShow: isShow,
+    },
+  });
+}
 export async function updateIsShow(cardId, gameId, isShow) {
   return await GameDeck.update(
     { isShow: isShow },

@@ -1,8 +1,6 @@
 import { errorHandler } from '@helper/error-handler';
 import { log } from '@helper/logger';
-import { findAllPlayers } from '@services/queries/player.queries';
 import { apigwManagement } from '@services/websocket-endpoint.service';
-import * as Voting from '../process-logic/voting';
 import { GameData } from './game.interface';
 import { GameManager } from './game.manager';
 
@@ -26,7 +24,7 @@ exports.createGame = async (event, context) => {
 
 exports.deleteGame = async (event, context) => {};
 
-exports.updateRound = async (event, context) => {
+exports.startGame = async (event, context) => {
   log(event);
 
   try {
@@ -35,7 +33,7 @@ exports.updateRound = async (event, context) => {
     const connectionId = event.requestContext.connectionId;
 
     console.log(connectionId);
-    return await manager.updateRound(connectionId);
+    return await manager.startGame(connectionId);
   } catch (e) {
     /**
      * Handle all errors

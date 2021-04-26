@@ -46,9 +46,6 @@ export async function giveCardsToPlayers(gameId) {
       healthCards.pop();
     }
   });
-
-  return healthCards;
-
   //console.log(healthCards,factCards,professionCards,hobbyCards,biologyCards, specialCards);
   // return [healthCards,factCards,professionCards,hobbyCards,biologyCards,specialCards];
 
