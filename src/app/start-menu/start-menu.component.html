@@ -1,0 +1,20 @@
+<h2>Начать игру</h2>
+
+<div>
+  <label for="name">Ваше имя </label>
+  <input id="name" #name />
+
+  <label for="link">Код для присоединения </label>
+  <input id="link" #link />
+
+  <button class="createGame-button"
+ (click)="createGame( name.toString() )">
+   Создать игру
+<!--   TODO сервис для создания игры /-->
+  </button>
+
+  <button class="joinGame-button" (click)="joinGame(name.toString(), link.toString())">
+    Присоединиться к игре
+<!--   TODO сервис для присоединения//-->
+  </button>
+</div>
