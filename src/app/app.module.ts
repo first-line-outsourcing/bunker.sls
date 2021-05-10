@@ -13,6 +13,8 @@ import { InMemoryDataService } from './in-memory-data.service';
 import { HeroSearchComponent } from './hero-search/hero-search.component';
 import { StartMenuComponent } from './start-menu/start-menu.component';
 import { GameComponent } from './game/game.component';
+import { ChatComponent } from './chat/chat.component';
+import { GameSetupComponent } from './game-setup/game-setup.component';
 
 @NgModule({
   declarations: [
@@ -23,10 +25,13 @@ import { GameComponent } from './game/game.component';
     DashboardComponent,
     HeroSearchComponent,
     StartMenuComponent,
-    GameComponent
-  ],
+    GameComponent,
+    ChatComponent,
+    GameSetupComponent,
+],
   imports: [
     BrowserModule,
+    FormsModule,
     HttpClientModule,
 
 // The HttpClientInMemoryWebApiModule module intercepts HTTP requests
