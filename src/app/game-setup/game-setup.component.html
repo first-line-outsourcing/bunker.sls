@@ -1,1 +1,60 @@
-<p>game-setup works!</p>
+<div *ngIf="setupGame">
+  <p>
+    <label for="purpose">Выберите цель игры </label>
+    <select id="purpose" [(ngModel)]="selectedPurpose">
+      <option value="false">Спасение</option>
+      <option value="true" >Возрождение</option>
+    </select>
+  </p>
+
+  <p>
+    <label for="mode">Выберите режим игры </label>
+    <select id="mode" [(ngModel)]="selectedMode">
+      <option value="false">Базовый режим</option>
+      <option value="true" >История выживания</option>
+    </select>
+  </p>
+
+  <p>
+    <label for="amountPlayers">Укажите количество игроков </label>
+    <input id="amountPlayers" type = "number" min="0" max="16" [(ngModel)]="selectedAmountPlayers">
+  </p>
+
+  <p>
+    <label for="link">Укажите уникальный код вашей игры </label>
+    <input id="link" [ngModel]="selectedLink" />
+  </p>
+  <button (click)="generateLink()">Другой код</button>
+
+  <p>
+    <label for="timeOnVote">Укажите количество секунд на голосование </label>
+    <input id="timeOnVote" max="60" min="0" [(ngModel)]="selectedTimeOnVote">
+  </p>
+
+  <p>
+    <label for="timeOnExcuse">Укажите количество секунд на высказывание </label>
+    <input id="timeOnExcuse" max="60" min="0" [(ngModel)]="selectedTimeOnExcuse">
+  </p>
+
+  <p>
+    <label for="timeOnDiscuss">Укажите количество секунд на голосование </label>
+    <input id="timeOnDiscuss" max="60" min="0" [(ngModel)]="selectedTimeOnDiscuss">
+  </p>
+
+  <p>
+    <label for="amountDangers">Укажите количество Угроз </label>
+    <input id="amountDangers" max="3" min="0" [(ngModel)]="selectedAmountDangers">
+  </p>
+
+  <p>
+    <label for="amountSpecialConditions">Укажите количество Угроз </label>
+    <input id="amountSpecialConditions" max="3" min="0" [(ngModel)]="selectedAmountSpecialConditions">
+  </p>
+
+  <button class="createGame-button" (click)="createGame()" >
+    Создать игру!
+  </button>
+
+</div>
+
+

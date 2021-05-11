@@ -40,7 +40,6 @@ import { GameSetupComponent } from './game-setup/game-setup.component';
     HttpClientInMemoryWebApiModule.forRoot(
       InMemoryDataService, { dataEncapsulation: false }
     ),
-    FormsModule,
     AppRoutingModule
   ],
   providers: [],

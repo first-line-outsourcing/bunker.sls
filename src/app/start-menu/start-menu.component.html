@@ -6,15 +6,18 @@
 
   <label for="link">Код для присоединения </label>
   <input id="link" #link />
-
-  <button class="createGame-button"
- (click)="createGame( name.toString() )">
-   Создать игру
-<!--   TODO сервис для создания игры /-->
-  </button>
-
   <button class="joinGame-button" (click)="joinGame(name.toString(), link.toString())">
     Присоединиться к игре
-<!--   TODO сервис для присоединения//-->
+    <!--   TODO сервис для присоединения//-->
   </button>
 </div>
+
+<div>
+  <button class="setSetupGame-button" (click)="setSetupGame()">
+    Настроить свою игру
+  </button>
+  <app-game-setup [setupGame]="setupGame"></app-game-setup>
+
+</div>
+
+
