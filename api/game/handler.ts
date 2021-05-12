@@ -10,9 +10,11 @@ exports.createGame = async (event, context) => {
   try {
     const manager = new GameManager();
 
-    const gameData: GameData = JSON.parse(event.body);
+    const data = JSON.parse(event.body);
 
-    console.log(gameData.link);
+    const gameData: GameData = data.body;
+
+    console.log(gameData);
     return await manager.createGame(gameData);
   } catch (e) {
     /**

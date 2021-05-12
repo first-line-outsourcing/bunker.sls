@@ -12,7 +12,22 @@ export function apigwManagement(event) {
   });
 }
 
-export async function postData(connectionId, data, event, gameId) {
+export async function postToPlayer(connectionId, postData, event) {
+  //TODO переделать с connectionId
+  const apigwManagementApi = await apigwManagement(event);
+  try {
+    await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: postData }).promise();
+  } catch (e) {
+    if (e.statusCode === 410) {
+      console.log(`Found stale connection set Offline ${connectionId}`);
+      await updateIsOnlineByConnectionId(connectionId);
+    } else {
+      throw e;
+    }
+  }
+}
+
+export async function postToAllPlayersData(connectionId, data, event, gameId) {
   const postData = JSON.parse(data);
   let connectionArray: string[] = [];
 
@@ -24,7 +39,8 @@ export async function postData(connectionId, data, event, gameId) {
   }
 
   const apigwManagementApi = await apigwManagement(event);
-  const postCalls = connectionArray.map(async ({ connectionId }) => {
+
+  const postCalls = connectionArray.map(async ({}) => {
     try {
       await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: postData }).promise();
     } catch (e) {

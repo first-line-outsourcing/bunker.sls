@@ -1,6 +1,7 @@
 import { errorHandler } from '@helper/error-handler';
 import { log } from '@helper/logger';
-import { apigwManagement } from '@services/websocket-endpoint.service';
+import { apigwManagement, postToPlayer } from '@services/websocket-endpoint.service';
+import { GameData } from '../game/game.interface';
 import { ConnectionPlayer, ReconnectionPlayer, Vote, DiscussData } from './player.interface';
 import { PlayerManager } from './player.manager';
 
@@ -41,8 +42,11 @@ exports.join = async (event, context) => {
 
     if (!event.body) return 'body is empty!';
 
-    connectionPlayer.body = JSON.parse(event.body);
-    return manager.joinPlayer(connectionPlayer);
+    const data = JSON.parse(event.body);
+    connectionPlayer.body = data.body;
+
+    return postToPlayer(connectionPlayer.connectionId, await manager.joinPlayer(connectionPlayer), event);
+    //return manager.joinPlayer(connectionPlayer);
   } catch (e) {
     /**
      * Handle all errors
@@ -101,6 +105,7 @@ exports.disconnect = async (event, context) => {
 };
 
 exports.defaults = async (event, context) => {
+  console.log(event);
   return await {
     statusCode: 200,
   };

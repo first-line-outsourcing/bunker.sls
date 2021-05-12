@@ -5,7 +5,6 @@
 export interface ConnectionPlayer {
   connectionId: string;
   body?: {
-    action: string;
     name: string;
     link: string;
   };

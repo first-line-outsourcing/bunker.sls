@@ -1,10 +1,8 @@
 import { AppError, CommonErrors } from '@helper/app-error';
-import { update } from '@services/queries/game.queries';
-import { findAllPlayers } from '@services/queries/player.queries';
 import { connect } from '@services/sequelize.service';
 import * as GameQueryes from '@services/queries/game.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
-import { ConnectionPlayer, DiscussData, ReconnectionPlayer, Vote } from './player.interface';
+import { ConnectionPlayer, ReconnectionPlayer, Vote } from './player.interface';
 import * as Voting from '../process-logic/voting';
 
 export class PlayerService {
@@ -24,7 +22,10 @@ export class PlayerService {
 
       const game = await GameQueryes.findGameByLink(connectionPlayer.body.link);
 
-      if (!game) return 'Game not found';
+      if (!game) {
+        console.log('link incorrect');
+        return 'Game not found';
+      }
 
       // Check offline players for reconnect
 
