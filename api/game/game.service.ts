@@ -2,6 +2,7 @@ import { AppError, CommonErrors } from '@helper/app-error';
 import * as GameQueryes from '@services/queries/game.queries';
 import { findCardOfIsShow, updateIsShow } from '@services/queries/gameDeck.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
+import { makeErrorData, makePostData } from '@services/websocket/websocket-makePostData';
 import * as Voting from '../process-logic/voting';
 import { GameData } from './game.interface';
 import { giveStartCards } from '@services/cards-functions/operations';
@@ -11,14 +12,14 @@ import { checkNumVoting } from './round';
 export class GameService {
   async createGame(gameData: GameData) {
     try {
-      if (!connect()) return 'Connection is failed';
+      if (!connect()) return makeErrorData('Connection is failed');
 
       const game = GameQueryes.create(gameData);
       //TODO  обновление статусов и тд и ответ
-      if (!game) return 'Game wasnt created';
+      if (!game) return makeErrorData('Game wasnt created');
 
       console.log('Game was created');
-      return 'Game was created';
+      return makePostData('SUCCESS');
     } catch (e) {
       throw new AppError(CommonErrors.InternalServerError, e.message);
     }

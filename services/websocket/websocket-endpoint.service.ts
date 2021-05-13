@@ -1,5 +1,6 @@
 import ApiGatewayManagementApi = require('aws-sdk/clients/apigatewaymanagementapi');
-import { findAllActiveConnectionId, updateIsOnlineByConnectionId } from '@services/queries/player.queries';
+import { PostData } from '@services/websocket/websocket-postData.interface';
+import { findAllActiveConnectionId, updateIsOnlineByConnectionId } from '../queries/player.queries';
 
 //send to client
 
@@ -12,11 +13,11 @@ export function apigwManagement(event) {
   });
 }
 
-export async function postToPlayer(connectionId, postData, event) {
+export async function postToPlayer(connectionId, postData: PostData, event) {
   //TODO переделать с connectionId
   const apigwManagementApi = await apigwManagement(event);
   try {
-    await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: postData }).promise();
+    await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: JSON.stringify(postData) }).promise();
   } catch (e) {
     if (e.statusCode === 410) {
       console.log(`Found stale connection set Offline ${connectionId}`);

@@ -1,6 +1,7 @@
 import { errorHandler } from '@helper/error-handler';
 import { log } from '@helper/logger';
-import { apigwManagement } from '@services/websocket-endpoint.service';
+import { postToPlayer } from '@services/websocket/websocket-endpoint.service';
+import { PostData } from '@services/websocket/websocket-postData.interface';
 import { GameData } from './game.interface';
 import { GameManager } from './game.manager';
 
@@ -15,7 +16,9 @@ exports.createGame = async (event, context) => {
     const gameData: GameData = data.body;
 
     console.log(gameData);
-    return await manager.createGame(gameData);
+
+    const postData: PostData = await manager.createGame(gameData);
+    return postToPlayer(event.requestContext.connectionId, postData, event);
   } catch (e) {
     /**
      * Handle all errors

@@ -2,6 +2,7 @@ import { AppError, CommonErrors } from '@helper/app-error';
 import { connect } from '@services/sequelize.service';
 import * as GameQueryes from '@services/queries/game.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
+import { makePostData, makeErrorData } from '@services/websocket/websocket-makePostData';
 import { ConnectionPlayer, ReconnectionPlayer, Vote } from './player.interface';
 import * as Voting from '../process-logic/voting';
 
@@ -16,15 +17,15 @@ export class PlayerService {
 
   async joinPlayer(connectionPlayer: ConnectionPlayer) {
     try {
-      if (!connect()) return 'Connection is failed';
+      if (!connect()) return makeErrorData('Connection is failed');
 
-      if (!connectionPlayer.body) return 'body empty';
+      if (!connectionPlayer.body) return makeErrorData('Body is empty');
 
       const game = await GameQueryes.findGameByLink(connectionPlayer.body.link);
 
       if (!game) {
-        console.log('link incorrect');
-        return 'Game not found';
+        console.log('Game not found');
+        return makeErrorData('Game not found.');
       }
 
       // Check offline players for reconnect
@@ -34,14 +35,17 @@ export class PlayerService {
         // return offlinePlayers for choosing special player
 
         console.log(offlinePlayers);
-        return offlinePlayers;
+        return makePostData('EXIST_OFFLINE_PLAYERS', offlinePlayers);
       }
 
-      if (game.numRound != -1) return 'Game is started';
+      if (game.numRound != -1) return makeErrorData('Game already started and hasnt offline players');
 
       // Standard create player
 
-      return await this.createPlayer(connectionPlayer.connectionId, game.id, connectionPlayer.body.name);
+      if (await this.createPlayer(connectionPlayer.connectionId, game.id, connectionPlayer.body.name))
+        return makePostData('SUCCESS');
+
+      return makeErrorData('Game is full');
     } catch (e) {
       throw new AppError(CommonErrors.InternalServerError, e.message);
     }
@@ -101,8 +105,8 @@ export class PlayerService {
         await PlayerQueryes.setIsOwner(connectionId);
       }
       console.log('player was created');
-      return 'Player has been created';
-    } else return 'Game is full';
+      return true;
+    }
   }
 
   async checkAmountPlayers(gameId) {
