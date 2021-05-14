@@ -12,16 +12,17 @@ import { checkNumVoting } from './round';
 export class GameService {
   async createGame(gameData: GameData) {
     try {
-      if (!connect()) return makeErrorData('Connection is failed');
+      //if (!connect()) return makeErrorData('Connection is failed');
 
-      const game = GameQueryes.create(gameData);
+      const game = await GameQueryes.create(gameData);
       //TODO  обновление статусов и тд и ответ
       if (!game) return makeErrorData('Game wasnt created');
 
       console.log('Game was created');
-      return makePostData('SUCCESS');
+      return makePostData('GAME_CREATE');
     } catch (e) {
-      throw new AppError(CommonErrors.InternalServerError, e.message);
+      return makeErrorData(e.message);
+      // throw new AppError(CommonErrors.InternalServerError, e.message);
     }
   }
 

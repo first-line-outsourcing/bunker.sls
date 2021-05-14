@@ -11,13 +11,14 @@ export class PlayerService {
     try {
       return 'Connection is succesful';
     } catch (e) {
-      throw new AppError(CommonErrors.InternalServerError, e.message);
+      return makeErrorData(e.message);
+      //throw new AppError(CommonErrors.InternalServerError, e.message);
     }
   }
 
   async joinPlayer(connectionPlayer: ConnectionPlayer) {
     try {
-      if (!connect()) return makeErrorData('Connection is failed');
+      // if (!connect()) return makeErrorData('Connection is failed');
 
       if (!connectionPlayer.body) return makeErrorData('Body is empty');
 
@@ -47,7 +48,8 @@ export class PlayerService {
 
       return makeErrorData('Game is full');
     } catch (e) {
-      throw new AppError(CommonErrors.InternalServerError, e.message);
+      return makeErrorData(e.message);
+      // throw new AppError(CommonErrors.InternalServerError, e.message);
     }
   }
 
