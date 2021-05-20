@@ -16,6 +16,10 @@ export async function create(gameData) {
   });
 }
 
+export async function findAllTest() {
+  return await Game.findAll();
+}
+
 export async function destroy(id) {
   return await Game.destroy({
     where: {

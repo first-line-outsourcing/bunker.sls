@@ -1,4 +1,4 @@
-import { PlayerDeck } from '@models/PostgreSQL';
+import { GameDeck, PlayerDeck } from '@models/PostgreSQL';
 
 export async function create(cardId, playerId) {
   return await PlayerDeck.create({
@@ -17,6 +17,33 @@ export async function updateCardData(cardId, playerId, isShow, isUse) {
       },
     }
   );
+}
+
+export async function findAllCardOfIsShow(playerId, isShow) {
+  const playerDeck = await PlayerDeck.findAll({
+    where: {
+      playerId: playerId,
+      isShow: isShow,
+    },
+  });
+  const arrayId: number[] = [];
+  playerDeck.map((value) => {
+    arrayId.push(value.cardId);
+  });
+  return arrayId;
+}
+
+export async function findAllCardWithIsShowByPlayerId(playerId) {
+  const playerDeck = await PlayerDeck.findAll({
+    where: {
+      playerId: playerId,
+    },
+  });
+  const arrayCard: { cardId: number; isShow: boolean }[] = [];
+  playerDeck.map((value) => {
+    arrayCard.push({ cardId: value.cardId, isShow: value.isShow });
+  });
+  return arrayCard;
 }
 
 // export async function updateIsUse(cardId, playerId, isUse) {

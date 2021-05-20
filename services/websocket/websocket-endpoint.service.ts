@@ -7,6 +7,8 @@ import { findAllActiveConnectionId, updateIsOnlineByConnectionId } from '../quer
 export function apigwManagement(event) {
   return new ApiGatewayManagementApi({
     apiVersion: '2018-11-29',
+    accessKeyId: process.env.AWS_ACCESS_ID,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
     endpoint: process.env.IS_OFFLINE
       ? 'http://localhost:3001'
       : `${event.requestContext.domainName}/${event.requestContext.stage}`,

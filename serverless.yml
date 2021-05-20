@@ -9,6 +9,8 @@ provider:
     hello: world # this is a hack for env plugin
   region: ${file(env.yml):${opt:stage, self:provider.stage}.REGION}
   profile: ${file(env.yml):${opt:stage, self:provider.stage}.PROFILE}
+  accessKeyId: ${file(env.yml):${opt:stage, self:provider.stage}.AWS_ACCESS_ID}
+  secretAccessKey: ${file(env.yml):${opt:stage, self:provider.stage}.AWS_SECRET_KEY}
   tags:
     client: ${file(env.yml):${opt:stage, self:provider.stage}.CLIENT}
   websocketApiRouteSelectionExpression: $request.body.action

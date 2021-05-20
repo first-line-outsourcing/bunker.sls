@@ -118,5 +118,5 @@ export class Player extends Model<PlayerSchema> {
   @AllowNull(false)
   @Default(false)
   @Column(DataType.BOOLEAN) //double vote on this player
-  multiVoteOnPlayer: boolean;
+  multiVoteOnPlayer: string;
 }

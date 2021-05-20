@@ -22,17 +22,6 @@ export interface CardSchema {
 
 @Table({ timestamps: false, modelName: 'Card' })
 export class Card extends Model<CardSchema> {
-  // @AutoIncrement
-  // @PrimaryKey
-  // @Column(DataType.INTEGER)
-  // id: number;
-  //
-  //   @HasMany(() => PlayerDeck, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  //   playerDecks: PlayerDeck[];
-  //
-  //  @HasMany(() => GameDeck, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  //  gameDecks: GameDeck[];
-
   @Length({ max: 20 })
   @AllowNull(false)
   @Column(DataType.TEXT)

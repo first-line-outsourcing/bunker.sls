@@ -19,7 +19,7 @@ export class GameService {
       if (!game) return makeErrorData('Game wasnt created');
 
       console.log('Game was created');
-      return makePostData('GAME_CREATE');
+      return makePostData('GAME_CREATED');
     } catch (e) {
       return makeErrorData(e.message);
       // throw new AppError(CommonErrors.InternalServerError, e.message);
