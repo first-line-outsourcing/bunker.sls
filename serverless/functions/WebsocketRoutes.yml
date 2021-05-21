@@ -48,7 +48,7 @@ createGame:
   handler: api/game/handler.createGame
   events:
     - websocket:
-        route: create
+        route: createGame
 
 startGame:
   handler: api/game/handler.startGame

@@ -46,7 +46,7 @@ exports.join = async (event, context) => {
     connectionPlayer.body = data.body;
 
     const PostData: PostData = await manager.joinPlayer(connectionPlayer);
-    return postToPlayer(connectionPlayer.connectionId, PostData, event);
+    return postToPlayer(connectionPlayer.connectionId, PostData);
   } catch (e) {
     /**
      * Handle all errors

@@ -4,20 +4,22 @@ import { findAllActiveConnectionId, updateIsOnlineByConnectionId } from '../quer
 
 //send to client
 
-export function apigwManagement(event) {
+export function apigwManagement() {
+  //TODO сделать нормально
   return new ApiGatewayManagementApi({
     apiVersion: '2018-11-29',
     accessKeyId: process.env.AWS_ACCESS_ID,
     secretAccessKey: process.env.AWS_SECRET_KEY,
-    endpoint: process.env.IS_OFFLINE
-      ? 'http://localhost:3001'
-      : `${event.requestContext.domainName}/${event.requestContext.stage}`,
+    // endpoint: process.env.IS_OFFLINE
+    //   ? 'http://localhost:3001'
+    //   : `${event.requestContext.domainName}/${event.requestContext.stage}`,
+    endpoint: 'http://localhost:3001',
   });
 }
 
-export async function postToPlayer(connectionId, postData: PostData, event) {
+export async function postToPlayer(connectionId, postData: PostData) {
   //TODO переделать с connectionId
-  const apigwManagementApi = await apigwManagement(event);
+  const apigwManagementApi = await apigwManagement();
   try {
     await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: JSON.stringify(postData) }).promise();
   } catch (e) {
@@ -30,8 +32,8 @@ export async function postToPlayer(connectionId, postData: PostData, event) {
   }
 }
 
-export async function postToAllPlayersData(connectionId, data, event, gameId) {
-  const postData = JSON.parse(data);
+export async function postToAllPlayersData(data, gameId) {
+  const postData = JSON.stringify(data);
   let connectionArray: string[] = [];
 
   try {
@@ -41,15 +43,15 @@ export async function postToAllPlayersData(connectionId, data, event, gameId) {
     return { statusCode: 500, body: e.stack };
   }
 
-  const apigwManagementApi = await apigwManagement(event);
+  const apigwManagementApi = await apigwManagement();
 
-  const postCalls = connectionArray.map(async ({}) => {
+  const postCalls = connectionArray.map(async (value) => {
     try {
-      await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: postData }).promise();
+      await apigwManagementApi.postToConnection({ ConnectionId: value, Data: postData }).promise();
     } catch (e) {
       if (e.statusCode === 410) {
-        console.log(`Found stale connection set Offline ${connectionId}`);
-        await updateIsOnlineByConnectionId(connectionId);
+        console.log(`Found stale connection set Offline ${value}`);
+        await updateIsOnlineByConnectionId(value);
       } else {
         throw e;
       }

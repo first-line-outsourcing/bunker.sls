@@ -22,6 +22,12 @@ export interface PostGameData {
     timeOnDiscuss: number;
     amountDangers: number;
     amountSpecialConditions: number;
+    numRound: number;
+    numVote: number;
+    statusOfRound: string;
+    outedPlayerInLastRound: string;
+    firstPlayerShowHeal: string;
+    typeCardOnThisRound: string;
   };
   cards?: PostCardData[];
 }
@@ -64,6 +70,7 @@ export function setPostPlayerData(player: Player) {
 export interface PostActivePlayerData {
   playerId?: string;
   name?: string;
+  isOwner?: boolean;
   isOut?: boolean;
   isShow?: boolean;
   isEndDiscuss?: boolean;
@@ -81,6 +88,7 @@ export function setPostActivePlayerData(player: Player) {
   return {
     playerId: player.playerId,
     name: player.name,
+    isOwner: player.isOwner,
     isOut: player.isOut,
     isShow: player.isShow,
     isEndDiscuss: player.isEndDiscuss,

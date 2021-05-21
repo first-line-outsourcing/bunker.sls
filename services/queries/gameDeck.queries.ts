@@ -31,7 +31,7 @@ export async function findAllCardOfIsShow(gameId, isShow) {
 }
 
 export async function updateIsShow(cardId, gameId, isShow) {
-  return await GameDeck.update(
+  await GameDeck.update(
     { isShow: isShow },
     {
       where: {

@@ -1,20 +1,19 @@
 import { AppError, CommonErrors } from '@helper/app-error';
-import { Player } from '@models/PostgreSQL';
-import { findAllCardOfIsShow as findGameIsShowCards } from '@services/queries/gameDeck.queries';
-import { findAllCards, read as cardRead } from '@services/queries/card.queries';
 import {
-  findAllCardOfIsShow as findPlayerIsShowCards,
-  findAllCardWithIsShowByPlayerId,
-} from '@services/queries/playerDeck.queries';
+  makeActivePlayerCardsData,
+  makeGameCardsData,
+  makePlayersCardsData,
+} from '@services/cards-functions/operations';
 import { findAllPlayers, findPlayerByConnectionId } from '@services/queries/player.queries';
 import { connect } from '@services/sequelize.service';
 import * as GameQueryes from '@services/queries/game.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
+import { postToAllPlayersData } from '@services/websocket/websocket-endpoint.service';
 import { makePostData, makeErrorData } from '@services/websocket/websocket-makePostData';
 import {
   PostActivePlayerData,
   PostAllData,
-  PostCardData,
+  PostData,
   PostGameData,
   PostPlayerData,
   setPostActivePlayerData,
@@ -55,27 +54,18 @@ export class PlayerService {
 
       if (game.numRound != -1) return makeErrorData("Game already started and hasn't offline players");
 
-      // Standard create player
+      // Sending data when player join
 
       if (await this.createPlayer(connectionPlayer.connectionId, game.id, connectionPlayer.body.name)) {
-        // Send data about game
+        const gameCards = await makeGameCardsData(game.id);
+        const postGameData: PostGameData = { game: game, cards: gameCards };
         //
-        //find all cardId
-        const cards = await findGameIsShowCards(game.id, true);
-        //find all cards by id
-        const cardsData = await findAllCards(cards);
-        //put all cards
-        const postGameCards: PostCardData[] = [];
-        cardsData.forEach((value) => {
-          postGameCards.push(value);
-        });
-        const postGameData: PostGameData = { game: game, cards: postGameCards };
-        //Send data about players
+        //Find all players data (active player is special)
         //
-        //find all players and get id
         const players = await findAllPlayers(game.id);
-        const postPlayersData: PostPlayerData[] = [];
+        let postPlayersData: PostPlayerData[] = [];
         let postActivePlayerData: PostActivePlayerData = {};
+        //
         for (const value of players) {
           //Check on active player
           if (value.connectionId == connectionPlayer.connectionId) {
@@ -84,46 +74,21 @@ export class PlayerService {
             postPlayersData.push(setPostPlayerData(value));
           }
         }
-        //find and get cards for each player
-        for (const value of postPlayersData) {
-          //find all cardId with isShow = true
-          const cards = await findPlayerIsShowCards(value.playerId, true);
-          //find all cards by id
-          const cardsData = await findAllCards(cards);
-          //put all cards
-          const postPlayerCards: PostCardData[] = [];
-          cardsData.forEach((value) => {
-            postPlayerCards.push(value);
-          });
-          value.cards = postPlayerCards;
-        }
+        postPlayersData = await makePlayersCardsData(postPlayersData);
         //
         //Send Active Player
-        //find all cardId with isShow = true
-        const activePlayerCards = await findAllCardWithIsShowByPlayerId(postActivePlayerData.playerId);
-        //find all cards by id
-        const cardsId: number[] = activePlayerCards.map((value) => value.cardId);
-        const activePlayerCardsData = await findAllCards(cardsId);
-        //put all cards
-        const activePlayerPostCardData: PostCardData[] = [];
-        activePlayerCardsData.forEach((value, index) => {
-          const card: PostCardData = {
-            id: value.id,
-            type: value.type,
-            name: value.name,
-            description: value.description,
-            isShow: activePlayerCards[index].isShow,
-          };
-          activePlayerPostCardData.push(value);
-        });
-        postActivePlayerData.cards = activePlayerPostCardData;
-        //PostAllData
-        const postAllData: PostAllData = {
+        //
+        postActivePlayerData.cards = await makeActivePlayerCardsData(postActivePlayerData.playerId);
+        await this.sendPlayerDataFromOtherPlayers(connectionPlayer.connectionId, game.id);
+        //
+        //Post AllData
+        //
+        const allPostData: PostAllData = {
           gameData: postGameData,
           playersData: postPlayersData,
           activePlayerData: postActivePlayerData,
         };
-        return makePostData('YOU_JOINED', postAllData);
+        return makePostData('YOU_JOINED', allPostData);
       }
       return makeErrorData('Game is full');
     } catch (e) {
@@ -194,5 +159,14 @@ export class PlayerService {
     if (!game) return 0;
 
     return (await PlayerQueryes.countPlayers(gameId)) < game.amountPlayers;
+  }
+
+  async sendPlayerDataFromOtherPlayers(connectionId: string, gameId) {
+    const player = await findPlayerByConnectionId(connectionId);
+    if (player) {
+      const playerData: PostPlayerData = setPostPlayerData(player);
+      const data: PostData = { status: 'NEW_PLAYER_JOINED', body: playerData };
+      postToAllPlayersData(data, gameId);
+    }
   }
 }

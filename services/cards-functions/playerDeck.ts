@@ -5,7 +5,6 @@ import { getAmountSpecial } from '@services/queries/game.queries';
 
 export async function giveCardsToPlayers(gameId) {
   const players = await findAndCountPlayers(gameId);
-
   const amountPlayers = players.count;
 
   const healthCards = await findCards('health', amountPlayers);
@@ -38,22 +37,14 @@ export async function giveCardsToPlayers(gameId) {
     biologyCards.pop();
   });
 
-  const amountSpecial = await +getAmountSpecial(gameId);
-  const specialCards = await findCards('special', amountPlayers + amountSpecial);
+  const amountSpecial = await getAmountSpecial(gameId);
+
+  const sumAmount = amountPlayers * +amountSpecial;
+  const specialCards = await findCards('special', sumAmount);
   players.rows.forEach((value) => {
     for (let i = 0; i < amountSpecial; i++) {
       create(specialCards[specialCards.length - 1].id, value.playerId);
       healthCards.pop();
     }
   });
-  //console.log(healthCards,factCards,professionCards,hobbyCards,biologyCards, specialCards);
-  // return [healthCards,factCards,professionCards,hobbyCards,biologyCards,specialCards];
-
-  // const shelterIdCards: Array<number> = await shelterCards.map(Card => Card.id);
-  //
-  // shelterIdCards.forEach(value => create(value,gameId));
-  // // TODO Danger cards too
-  // //TODO response to clients cards
-  //
-  // return "Game Cards is ready";
 }

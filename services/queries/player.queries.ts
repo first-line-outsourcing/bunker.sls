@@ -163,7 +163,7 @@ export async function updateSelectedPlayerByConnectionId(connectionId, selectedP
     },
     {
       where: {
-        connectionid: connectionId,
+        connectionId: connectionId,
       },
     }
   );

@@ -1,5 +1,5 @@
 import { updateCardData } from '@services/queries/playerDeck.queries';
-import { read } from '@services/queries/card.queries';
+import { findCardById } from '@services/queries/card.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
 import * as GameQueryes from '@services/queries/game.queries';
 import { PlayerCardData } from './playerDeck.interface';
@@ -16,7 +16,7 @@ export class PlayerDeckService {
     if (game.statusOfRound != 'Excusing') return 'You cannot showing right now';
 
     //Checking of type card;
-    const card = await read(playerCardData.cardId);
+    const card = await findCardById(playerCardData.cardId);
     if (!card) return 0;
 
     if (card.type == game.typeCardOnThisRound || game.typeCardOnThisRound == 'none') {
