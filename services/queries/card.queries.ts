@@ -1,7 +1,7 @@
 import { Card } from '@models/PostgreSQL';
 import sequelize from '@services/sequelize';
 
-export async function findCardById(id) {
+export async function findCardById(id: number) {
   return await Card.findByPk(id);
 }
 

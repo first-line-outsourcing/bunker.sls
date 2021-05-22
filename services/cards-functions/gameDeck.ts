@@ -11,5 +11,5 @@ export async function giveCardsToGame(gameId) {
   for (const value of shelterCards) {
     await create(value.id, gameId);
   }
-  await updateIsShow(shelterCards[0].id, gameId, true);
+  // await updateIsShow(shelterCards[0].id, gameId, true);
 }

@@ -1,6 +1,6 @@
 import { errorHandler } from '@helper/error-handler';
 import { log } from '@helper/logger';
-import { postToAllPlayersData, postToPlayer } from '@services/websocket/websocket-endpoint.service';
+import { postToPlayer } from '@services/websocket/websocket-endpoint.service';
 import { PostData } from '@services/websocket/websocket-postData.interface';
 import { GameData } from './game.interface';
 import { GameManager } from './game.manager';
@@ -54,8 +54,9 @@ exports.updateStatus = async (event, context) => {
 
     const connectionId = event.requestContext.connectionId;
 
-    console.log(connectionId);
-    return await manager.updateStatus(connectionId);
+    console.log('Start updated status');
+    const postData = await manager.updateStatus(connectionId);
+    return postToPlayer(connectionId, postData);
   } catch (e) {
     /**
      * Handle all errors

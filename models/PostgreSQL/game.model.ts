@@ -14,6 +14,7 @@ export interface GameSchema {
   link: string;
   amountDangers?: number;
   amountSpecialConditions?: number;
+  activePlayer?: string;
   numRound?: number;
   numVote?: number;
   statusOfRound?: string;
@@ -94,6 +95,9 @@ export class Game extends Model<GameSchema> {
 
   @Column(DataType.TEXT) //Last outed man
   outedPlayerInLastRound: string;
+
+  @Column(DataType.TEXT)
+  activePlayer: string;
 
   @Column(DataType.TEXT)
   firstPlayerShowHeal: string;

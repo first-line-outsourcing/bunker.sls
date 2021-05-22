@@ -86,6 +86,19 @@ export async function updateNumRound(gameId, numRound) {
   );
 }
 
+export async function updateActivePlayer(gameId, playerId) {
+  return await Game.update(
+    {
+      activePlayer: playerId,
+    },
+    {
+      where: {
+        id: gameId,
+      },
+    }
+  );
+}
+
 export async function findGameByLink(link: string) {
   return await Game.findOne({
     where: { link: link },

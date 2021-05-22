@@ -88,7 +88,7 @@ export class PlayerService {
           playersData: postPlayersData,
           activePlayerData: postActivePlayerData,
         };
-        return makePostData('YOU_JOINED', allPostData);
+        return makePostData('YOU_JOIN', allPostData);
       }
       return makeErrorData('Game is full');
     } catch (e) {
@@ -165,7 +165,7 @@ export class PlayerService {
     const player = await findPlayerByConnectionId(connectionId);
     if (player) {
       const playerData: PostPlayerData = setPostPlayerData(player);
-      const data: PostData = { status: 'NEW_PLAYER_JOINED', body: playerData };
+      const data: PostData = { status: 'NEW_PLAYER_JOIN', body: playerData };
       postToAllPlayersData(data, gameId);
     }
   }

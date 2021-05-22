@@ -42,6 +42,14 @@ endDiscuss:
     - websocket:
         route: endDiscuss
 
+# CHAT
+
+sendMessage:
+  handler: api/chat/handler.sendMessage
+  events:
+    - websocket:
+        route: sendMessage
+
 # GAME
 
 createGame:

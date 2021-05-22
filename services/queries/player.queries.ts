@@ -35,6 +35,15 @@ export async function findAllPlayers(gameId) {
   });
 }
 
+export async function findPlayerWithIsShow(gameId, isShow) {
+  return await Player.findOne({
+    where: {
+      gameId: gameId,
+      isShow: isShow,
+    },
+  });
+}
+
 export async function findAllOfflinePlayers(gameId) {
   const { count, rows } = await Player.findAndCountAll({
     where: {

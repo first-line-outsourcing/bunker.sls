@@ -5,6 +5,10 @@ export interface PostData {
   body?: {};
 }
 
+export interface PostExcusePlayerData {
+  playerId: string;
+}
+
 export interface PostAllData {
   gameData: PostGameData;
   activePlayerData?: PostActivePlayerData;
@@ -25,6 +29,7 @@ export interface PostGameData {
     numRound: number;
     numVote: number;
     statusOfRound: string;
+    activePlayer: string;
     outedPlayerInLastRound: string;
     firstPlayerShowHeal: string;
     typeCardOnThisRound: string;
@@ -108,4 +113,9 @@ export interface PostCardData {
   type: string;
   description: string;
   isShow?: boolean;
+}
+
+export interface UpdatePlayerCardData {
+  playerId: string;
+  postCardData: PostCardData;
 }

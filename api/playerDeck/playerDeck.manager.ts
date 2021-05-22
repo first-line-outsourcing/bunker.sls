@@ -17,9 +17,7 @@ export class PlayerDeckManager {
     this.service = new PlayerDeckService();
   }
 
-  updateCard(playerCardData: PlayerCardData) {
-    //TODO ERRORs
-
-    return this.service.updateCard(playerCardData);
+  updateCard(playerCardData: PlayerCardData, connectionId: string) {
+    return this.service.updateCard(playerCardData, connectionId);
   }
 }
