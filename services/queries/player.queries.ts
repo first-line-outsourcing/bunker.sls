@@ -2,6 +2,7 @@
 
 import { Player } from '../../models/PostgreSQL';
 import { ID } from '../generate-id.service';
+import { Op } from 'sequelize';
 
 // FIND
 
@@ -35,11 +36,12 @@ export async function findAllPlayers(gameId) {
   });
 }
 
-export async function findPlayerWithIsShow(gameId, isShow) {
+export async function findPlayerWithIsShowIsOut(gameId, isShow, isOut) {
   return await Player.findOne({
     where: {
       gameId: gameId,
       isShow: isShow,
+      isOut: isOut,
     },
   });
 }
@@ -73,12 +75,11 @@ export async function countPlayers(gameId) {
   return Player.count({ where: { gameId: gameId } });
 }
 
-export async function countIsEndDiscuss(gameId) {
-  const Op = require('sequelize');
+export async function countIsEndExcuse(gameId) {
   return Player.count({
     where: {
       [Op.or]: [
-        { gameId: gameId, isEndDiscuss: true },
+        { gameId: gameId, isShow: true },
         { gameId: gameId, isOnline: false },
       ],
     },
@@ -94,7 +95,7 @@ export async function updateBanVoteOnThisPlayer(playerId, banVoteOnThisPlayer) {
     },
     {
       where: {
-        id: playerId,
+        playerId: playerId,
       },
     }
   );
@@ -159,7 +160,7 @@ export async function updateSelectedPlayer(playerId, selectedPlayer) {
     },
     {
       where: {
-        id: playerId,
+        playerId: playerId,
       },
     }
   );

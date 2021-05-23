@@ -18,7 +18,6 @@ export async function updateCardData(cardId, playerId, isShow, isUse) {
     }
   );
 }
-
 export async function findAllCardOfIsShow(playerId, isShow) {
   const playerDeck = await PlayerDeck.findAll({
     where: {

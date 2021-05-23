@@ -8,7 +8,7 @@ import { findAllPlayers, findPlayerByConnectionId } from '@services/queries/play
 import { connect } from '@services/sequelize.service';
 import * as GameQueryes from '@services/queries/game.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
-import { postToAllPlayersData } from '@services/websocket/websocket-endpoint.service';
+import { postToAllPlayersData, postToPlayer } from '@services/websocket/websocket-endpoint.service';
 import { makePostData, makeErrorData } from '@services/websocket/websocket-makePostData';
 import {
   PostActivePlayerData,
@@ -123,17 +123,21 @@ export class PlayerService {
     return 'Player leave game';
   }
 
-  async sendVote(vote: Vote) {
-    const player = await PlayerQueryes.findPlayerByConnectionId(vote.connectionId);
-    if (!player) return 'Player not find';
+  async sendVote(vote: Vote, connectionId) {
+    const player = await PlayerQueryes.findPlayerByConnectionId(connectionId);
+    if (!player) return makeErrorData('Player not found');
     const game = await GameQueryes.read(player.gameId);
-    if (!game) return 'Game not found';
+    if (!game) return makeErrorData('Game not found');
+    const checkingInfo = await Voting.checkingParametres(player, game, vote);
 
-    if ((await Voting.checkingParametres(player, game, vote)) == 200) {
-      //Voting
-
+    if (checkingInfo == 'SUCCESS') {
       await PlayerQueryes.updateSelectedPlayer(player.playerId, vote.playerOnVote);
+      const playerUp = await PlayerQueryes.findPlayerById(player.playerId);
+      console.log(playerUp?.selectedPlayer);
+      await postToPlayer(connectionId, makePostData('YOU VOTE'));
+      return makePostData(checkingInfo);
     }
+    return makeErrorData(checkingInfo);
   }
 
   async endDiscuss(connectionId: string) {

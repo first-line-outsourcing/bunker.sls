@@ -1,5 +1,6 @@
 import { sendUpdatePlayerCard } from '@services/cards-functions/sendFunctions';
-import { updateCardData } from '@services/queries/playerDeck.queries';
+import { TimeFactor } from '@services/execByTime.service';
+import { read, updateCardData } from '@services/queries/playerDeck.queries';
 import { findCardById } from '@services/queries/card.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
 import * as GameQueryes from '@services/queries/game.queries';
@@ -13,6 +14,7 @@ export class PlayerDeckService {
     if (!player) return makeErrorData('Player not found');
     //Checking player show in this round or not;
     if (player.isShow) return makeErrorData('You cannot showing in this round');
+    if (player.isOut) return makeErrorData('You cannot showing cards');
 
     const game = await GameQueryes.read(player.gameId);
     if (!game) return makeErrorData('Game not found');
@@ -23,11 +25,17 @@ export class PlayerDeckService {
     if (!card) return makeErrorData('Card not found');
 
     if (card.type == game.typeCardOnThisRound || game.typeCardOnThisRound == 'none') {
+      const card = await read(playerCardData.cardId, player.playerId);
+      if (card?.isShow) return makeErrorData('You already show this card!');
       await updateCardData(playerCardData.cardId, player.playerId, true, false);
       await sendUpdatePlayerCard(game.id, playerCardData.cardId, player.playerId);
-      //SET active player
+      //SET New active player
       await PlayerQueryes.updateIsShow(player.playerId, true);
-      await sendExcusePlayers(game.id);
+      const timeFactor = new TimeFactor();
+      console.log(timeFactor.factor);
+      setTimeout(async () => {
+        await sendExcusePlayers(game.id);
+      }, game.timeOnExcuse * timeFactor.factor);
       return makePostData('YOU_SHOW_CARD');
     }
     return makeErrorData('Is Wrong Type of Card');

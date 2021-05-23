@@ -29,8 +29,8 @@ export class PlayerManager {
     return this.service.disconnectPlayer(id);
   }
 
-  sendVote(vote: Vote) {
-    return this.service.sendVote(vote);
+  sendVote(vote: Vote, connectionId: string) {
+    return this.service.sendVote(vote, connectionId);
   }
 
   endDiscuss(discussData: DiscussData) {

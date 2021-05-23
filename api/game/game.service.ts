@@ -1,11 +1,12 @@
 import { AppError, CommonErrors } from '@helper/app-error';
-import { sendUpdatedGameData } from '@services/cards-functions/sendFunctions';
+import { updateIsShowForPlayers } from '@services/cards-functions/operations';
+import { sendUpdatedGameData, sendUpdateGameCard } from '@services/cards-functions/sendFunctions';
+import { TimeFactor } from '@services/execByTime.service';
 import * as GameQueryes from '@services/queries/game.queries';
 import * as PlayerQueryes from '@services/queries/player.queries';
 import { makeErrorData, makePostData } from '@services/websocket/websocket-makePostData';
-import * as Voting from '../process-logic/voting';
 import { GameData } from './game.interface';
-import { goToRound, sendExcusePlayers } from './round';
+import { goToDiscuss, goToEndDiscuss, goToEndVoting, goToExcuse, goToRound, sendExcusePlayers } from './round';
 
 export class GameService {
   async createGame(gameData: GameData) {
@@ -34,6 +35,7 @@ export class GameService {
       if (!game) return makeErrorData('Game not found');
 
       const count = await PlayerQueryes.countPlayers(player.gameId);
+      //TODO временно для отладки
       // if (count != game.amountPlayers) return makeErrorData(`Not enough players. Need: ${game.amountPlayers}`);
       console.log('startGoToRound');
       const numRound = game.numRound + 1;
@@ -55,55 +57,51 @@ export class GameService {
     const game = await GameQueryes.read(player.gameId);
     if (!game) return makeErrorData('Game not found');
 
-    //Check current status
+    // Check current status
+    //Any case contains function of next case/status
     switch (game.statusOfRound) {
       //Костыль, используется один раз в начале игры после создания, чтобы не создавать отдельные роуты на обновление раунда
       case 'Not Start': {
-        const numRound = game.numRound + 1;
-        await GameQueryes.updateNumRound(game.id, numRound);
-        await GameQueryes.updateStatusOfRound(game.id, 'excuse');
-        const test = await GameQueryes.read(game.id);
-        console.log(test?.numRound);
-        await goToRound(game.id, numRound, game.amountPlayers);
-        await sendUpdatedGameData(game.id);
-        await sendExcusePlayers(game.id);
-        return makePostData('START_FIRST_ROUND');
+        //Start Round
+        return await goToExcuse(game);
       }
       case 'excuse': {
-        const count = await PlayerQueryes.countIsEndDiscuss(player.gameId);
-        if (count == game.amountPlayers) {
-          await GameQueryes.updateStatusOfRound(game.id, 'discuss');
-          //TODO доделать ответы
-        }
-        return makePostData('START_DISCUSS');
+        return await goToDiscuss(game);
       }
       case 'discuss': {
+        return await goToEndDiscuss(game.id);
+      }
+      case 'end_discuss': {
+        //Check amount votes in this round;
+        if (game.numVote == 0) {
+          await updateIsShowForPlayers(game.id, false);
+          await sendUpdatedGameData(game.id);
+          return await goToExcuse(game);
+        }
+        //Standard process
         await GameQueryes.updateStatusOfRound(game.id, 'voting');
+        await sendUpdatedGameData(game.id);
+        const timeFactor = new TimeFactor();
+        setTimeout(async () => {
+          const updatedGame = await GameQueryes.read(game.id);
+          if (updatedGame?.statusOfRound == 'voting') {
+            await goToEndVoting(game.id, game.numVote, game.amountPlayers);
+          }
+        }, game.timeOnVote * timeFactor.factor);
         return makePostData('START_VOTING');
       }
       case 'voting': {
-        //Check amount voting
-        const players = await PlayerQueryes.findAllPlayers(player.gameId);
-
-        if ((await Voting.countVotes(players)) != game.amountPlayers) return makeErrorData('Not enough players voted');
-
-        //calc all voting
-        const listOfMax = await Voting.calcVoting(players);
-
-        if (!(await Voting.defineResult(listOfMax, game.id, game.numVote))) return makePostData('REPEAT_VOTING');
-        //TODO ответ
-
-        await GameQueryes.updateStatusOfRound(game.id, 'sendingVote');
-        return makePostData('START_SENDING_VOTE');
+        return await goToEndVoting(game.id, game.numVote, game.amountPlayers);
       }
-      case 'sendingVote': {
-        await GameQueryes.updateNumRound(game.id, game.numRound++);
-
-        await GameQueryes.updateStatusOfRound(game.id, 'excuse');
-
-        await goToRound(game.id, game.numRound, game.amountPlayers);
-        return makePostData('START_NEW_ROUND');
+      case 'end_voting': {
+        const updatedGame = await GameQueryes.read(game.id);
+        if (updatedGame?.numVote != 0) {
+          return await goToDiscuss(game);
+        }
+        //START NEW ROUND
+        return await goToExcuse(game);
       }
+
       default: {
         return makeErrorData('Incorrect value');
       }

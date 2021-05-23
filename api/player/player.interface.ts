@@ -16,8 +16,7 @@ export interface ReconnectionPlayer {
 }
 
 export interface Vote {
-  connectionId: string;
-  playerOnVote?: string;
+  playerOnVote: string;
 }
 
 export interface DiscussData {

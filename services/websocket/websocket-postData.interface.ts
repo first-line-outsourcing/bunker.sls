@@ -119,3 +119,11 @@ export interface UpdatePlayerCardData {
   playerId: string;
   postCardData: PostCardData;
 }
+
+export interface PlayerVotes {
+  playerId: string;
+  name: string;
+}
+export interface PlayersVotes {
+  body: PlayersVotes[];
+}

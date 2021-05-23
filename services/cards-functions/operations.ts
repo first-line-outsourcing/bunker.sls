@@ -2,6 +2,7 @@ import { giveCardsToGame } from '@services/cards-functions/gameDeck';
 import { giveCardsToPlayers } from '@services/cards-functions/playerDeck';
 import { findAllCards } from '@services/queries/card.queries';
 import { findAllCardOfIsShow as findGameIsShowCards } from '@services/queries/gameDeck.queries';
+import * as PlayerQueryes from '@services/queries/player.queries';
 import {
   findAllCardOfIsShow as findPlayerIsShowCards,
   findAllCardWithIsShowByPlayerId,
@@ -59,4 +60,11 @@ export async function makeActivePlayerCardsData(playerId) {
     activePlayerPostCardData.push(card);
   });
   return activePlayerPostCardData;
+}
+
+export async function updateIsShowForPlayers(gameId, isShow) {
+  const players = await PlayerQueryes.findAllPlayers(gameId);
+  const playerIdArray = players.map((value) => value.playerId);
+  //Set IsShow false for repeat in next round
+  await PlayerQueryes.updateIsShow(playerIdArray, isShow);
 }

@@ -106,7 +106,7 @@ exports.disconnect = async (event, context) => {
 
 exports.defaults = async (event, context) => {
   console.log(event);
-  return await {
+  return {
     statusCode: 200,
   };
 };
@@ -122,14 +122,11 @@ exports.sendVote = async (event, context) => {
      * Prepare required data
      */
 
-    const vote: Vote = {
-      connectionId: event.requestContext.connectionId,
-    };
-
     if (!event.body) return 'body is empty!';
-
-    vote.playerOnVote = JSON.parse(event.body);
-    return manager.sendVote(vote);
+    const data = JSON.parse(event.body);
+    const vote: Vote = { playerOnVote: data.body.playerOnVote };
+    const postData: PostData = await manager.sendVote(vote, event.requestContext.connectionId);
+    return postToPlayer(event.requestContext.connectionId, postData);
   } catch (e) {
     /**
      * Handle all errors
